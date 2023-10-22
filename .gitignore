@@ -1,0 +1,9 @@
+# built app binary
+tasks-app
+
+# env files
+*.env
+
+.idea/**
+
+

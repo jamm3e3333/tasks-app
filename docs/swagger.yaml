@@ -1,0 +1,209 @@
+definitions:
+  body.CreateTaskBody:
+    properties:
+      is_done:
+        type: boolean
+      task:
+        type: string
+    required:
+    - is_done
+    - task
+    type: object
+  body.UpdateTaskBody:
+    properties:
+      is_done:
+        type: boolean
+      task:
+        type: string
+    required:
+    - is_done
+    - task
+    type: object
+  errors.HTTPError:
+    type: object
+  response.GetListTaskResponse:
+    properties:
+      id:
+        type: string
+      is_done:
+        type: boolean
+      task:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /health:
+    get:
+      description: Health check of the application
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Health check
+      tags:
+      - App
+  /task:
+    get:
+      consumes:
+      - application/json
+      description: Fetches a list of all available tasks.
+      parameters:
+      - description: Request UUID
+        in: header
+        name: X-Request-UUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully fetched list of tasks
+          schema:
+            items:
+              $ref: '#/definitions/response.GetListTaskResponse'
+            type: array
+        "404":
+          description: Tasks not found
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: Get a list of tasks
+      tags:
+      - Task
+    post:
+      consumes:
+      - application/json
+      description: Create a new task with given details.
+      parameters:
+      - description: Task creation payload
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/body.CreateTaskBody'
+      - description: Request UUID
+        in: header
+        name: X-Request-UUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created task
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: Create a task
+      tags:
+      - Task
+  /task/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a task identified by its ID.
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request UUID
+        in: header
+        name: X-Request-UUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted task
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "400":
+          description: Bad request - Cannot delete task
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: Delete a task
+      tags:
+      - Task
+    get:
+      consumes:
+      - application/json
+      description: Fetches detailed information for a specific task by its ID.
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request UUID
+        in: header
+        name: X-Request-UUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully fetched task details
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "404":
+          description: Task not found
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: Get details of a specific task
+      tags:
+      - Task
+    put:
+      consumes:
+      - application/json
+      description: Updates the details of a task identified by its ID.
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request UUID
+        in: header
+        name: X-Request-UUID
+        required: true
+        type: string
+      - description: Task update payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/body.UpdateTaskBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated task
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: Update a task
+      tags:
+      - Task
+swagger: "2.0"
